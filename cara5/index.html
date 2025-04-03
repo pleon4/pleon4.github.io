@@ -8,68 +8,45 @@
     <script>
        let t = 0;
        let bgColor; 
-      // Declara i inicialitza la variable 't', que servirà per crear un moviment suau amb 'noise()'.
-let mic;
-      let temblar;
-    let sinus;//creem una variable que es diu sinus
+       let mic;
+       let temblar;
+       let sinus;
+      
       function setup() {
-  createCanvas(windowWidth,windowHeight);
-        mic=new p5.AudioIn();// guarda a la variable mic una entrada de audio de p5.js
-        mic.start();// activa el micròfon
-        bgColor = color(200, 220, 255)
-}
-function draw() {
-   t += 0.01;
-        // Incrementa la variable 't' per fer que el 'noise()' canviï progressivament.
+          createCanvas(windowWidth, windowHeight);
+          mic = new p5.AudioIn();
+          mic.start();
+          bgColor = color(50, 80, 150); // Color de fondo más oscuro
+      }
 
-        let noiseX = noise(t) * 100 - 50;
-        // Calcula la posició X del centre de la cara.
-        // width / 2: Posa el centre a la meitat de l'amplada del canvas.
-        // noise(t): Funció 'noise' genera valors suaus entre 0 i 1, donant moviment orgànic.
-        // * 100: Amplifica el moviment.
-        // - 50: Centra el moviment al voltant de la posició original.
+      function draw() {
+          t += 0.01;
+          temblar = random(10, 50);
+          sinus = sin(frameCount * 0.1);
+          let movsinus = map(sinus, -1, 1, 0, 255);
+          let vol = mic.getLevel();
+          let h = map(vol, 0, 1, 0, 800);
 
-        let noiseY = noise(t + 100) * 100 - 50;
-        // Calcula la posició Y del centre de la cara amb el mateix patró.
-        // noise(t + 100): Utilitza un desplaçament (+100) perquè X i Y siguin independents.
+          background(bgColor);
+          fill(255, 165, 100); // Color cara más anaranjado
+          ellipse(windowWidth / 2, windowHeight / 2, 300 + movsinus, 300 + movsinus);
+          
+          fill(50, 200, 50); // Color ojos verdes
+          ellipse(windowWidth / 2 - 70, windowHeight / 2 - 60, 40, 40); // Ojo derecho más redondo
+          ellipse(windowWidth / 2 + 70, windowHeight / 2 - 60, 40, 40); // Ojo izquierdo más redondo
+          
+          arc(windowWidth / 2, windowHeight / 2 + 90, 100, 50 + h, 0, PI);
 
-  temblar=random(10,50);
- sinus=sin(frameCount * 0.1);//la variable sinus crea numeros entre -1 i +1
-  //frameCount esta contant els fotogrames i fa 60 a sinus per segon
-  //això vol dir 60 numeros entre -1 i 1 ordenats per segon
-  let movsinus=map(sinus,-1,1,0,255);
-  //converteix els numeros entre -1 i +1 donaran numeros proporcionals
-//entre 0 50 
-  let vol=mic.getLevel();
-  let h=map(vol,0,1,0,800);
-  background(bgColor);// color de fons
-  fill(192, 165, 227+movsinus);// color cara
-  ellipse(windowWidth/2,windowHeight/2,300+movsinus,300+movsinus);// cara
-  // windowWidth/2 significa que el centre de la cara coincideix amb el centre de la finestra
-  // windowHeight/2 significa el centre de la cara en alçada i coincideix amb el centre de la cara
-  // el primer que hi ha entre parentesis és diu paramètre y es la posició de X y del centre de la cara
-  // el segon paramètre és la posició Y
-  // el tercer paràmetre es l'amplada de la cara
-  // el quart és l'alçada de la cara
-  // temblar esta sumat a la amplada i alçada de la cara i canviara aleatoriament entre 10-50 pixels
- fill(5, 23+h*2, 14);// color ulls
-  ellipse(windowWidth/2-70,windowHeight/2-60,50-h,50-h+movsinus*2);// ull dret
-  ellipse(windowWidth/2+70,windowHeight/2-60-h,50,50+h+movsinus*2);// ull esquerra
-  arc(windowWidth/2,windowHeight/2+90,100,50+h,0,PI);// boca
-  fill(0, 0, 0);//color negre
-  ellipse(50,50,20,20);//cos del mosquit negre de forma rodona 20 pixels ample i 20 pixels alt i situat a 50 pixels de la cantonada superior esquerra
-  fill(255, 255, 255);//color blanc de les ales 
-  ellipse(60,40,25,25);//ala blanca de la dreta
-  ellipse(40,60,25,25);//ala blanca de la esquerra
-}
-       /* Funció per canviar el color de fons:
-       Utilitza random() per generar components RGB aleatoris dins d'un interval.
-       Aquesta funció es crida en prémer el botó "Canvia Fons". */
-    function changeBackground() {
-      bgColor = color(random(100, 255), random(100, 255), random(100, 255));
-    }
-
-      console.log(h);
+          fill(0);
+          ellipse(50, 50, 20, 20);
+          fill(255);
+          ellipse(60, 40, 25, 25);
+          ellipse(40, 60, 25, 25);
+      }
+      
+      function changeBackground() {
+          bgColor = color(random(50, 150), random(50, 150), random(150, 255));
+      }
     </script>
-</body>
+  </body>
 </html>

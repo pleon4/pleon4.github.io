@@ -9,7 +9,7 @@
       let t = 0;
       let bgColor;
       let mic;
-      let smile = false;
+      let smile = true;
       let mosques = [];
       let hatHue = 0;
       let blink = false;
@@ -27,30 +27,30 @@
 
         setInterval(() => {
           blink = true;
-          setTimeout(() => blink = false, 300); // duració del parpelleig
-        }, 12000); // cada 12 segons
+          setTimeout(() => blink = false, 300);
+        }, 12000);
       }
 
       function draw() {
         t += 0.01;
         hatHue = (hatHue + 0.5) % 360;
         let noise1 = noise(t) * 100;
-        let noise2 = noise(t + 100) * 50;
         let h = map(mic.getLevel(), 0, 1, 0, 300);
 
         background(bgColor);
 
         // Cara
-        fill(40, 100, 95); // cara en tons suaus
+        fill(40, 100, 95);
         ellipse(mouseX, mouseY, 300 + noise1, 300 + noise1);
 
-        // Boca
+        // Boca gran i somrient
         fill(0, 100, 60);
-        if (smile) {
-          arc(mouseX, mouseY + 90, 100, 50 + h, 0, PI);
-        } else {
-          arc(mouseX, mouseY + 90, 100, 50 + h, PI, TWO_PI);
-        }
+        arc(mouseX, mouseY + 90, 150, 80 + h, 0, PI, CHORD);
+
+        // Galtes
+        fill(0, 80, 100, 0.4);
+        ellipse(mouseX - 90, mouseY + 40, 30, 20);
+        ellipse(mouseX + 90, mouseY + 40, 30, 20);
 
         // Nas
         fill(50, 80, 90);
@@ -60,29 +60,33 @@
           mouseX + 15, mouseY + 20 - h * 3
         );
 
-        // Barret original amb color suau canviant
+        // Barret proper al cap
         push();
         fill(hatHue, 100, 60);
         beginShape();
-        vertex(mouseX - 100, mouseY - 180 - h * 3);
-        vertex(mouseX - 120, mouseY - 220 - h * 3);
-        vertex(mouseX - 60, mouseY - 300 - h * 3);
-        vertex(mouseX + 60, mouseY - 300 - h * 3);
-        vertex(mouseX + 120, mouseY - 220 - h * 3);
-        vertex(mouseX + 100, mouseY - 180 - h * 3);
+        vertex(mouseX - 100, mouseY - 140 - h * 3);
+        vertex(mouseX - 110, mouseY - 180 - h * 3);
+        vertex(mouseX - 60, mouseY - 250 - h * 3);
+        vertex(mouseX + 60, mouseY - 250 - h * 3);
+        vertex(mouseX + 110, mouseY - 180 - h * 3);
+        vertex(mouseX + 100, mouseY - 140 - h * 3);
         endShape(CLOSE);
         pop();
 
-        // Ulls rodons
-        fill(0, 0, 100); // blanc
+        // Ulls rodons i brillants
+        fill(0, 0, 100);
         ellipse(mouseX - 70, mouseY - 60, 50, blink ? 5 : 50); 
         ellipse(mouseX + 70, mouseY - 60, 50, blink ? 5 : 50); 
 
-        fill(0, 0, 0); // pupil·la negra
+        fill(0, 0, 0);
         ellipse(mouseX - 70, mouseY - 60, 20, blink ? 2 : 20); 
         ellipse(mouseX + 70, mouseY - 60, 20, blink ? 2 : 20); 
 
-        // Dibuixar les mosques
+        fill(0, 0, 100, 0.5); // brillantor a l'ull
+        ellipse(mouseX - 75, mouseY - 65, 8, 8);
+        ellipse(mouseX + 65, mouseY - 65, 8, 8);
+
+        // Mosques
         for (let m of mosques) {
           m.mou();
           m.mostra();
@@ -117,12 +121,6 @@
           fill(this.colorCos);
           ellipse(0, 0, this.ample + 5, this.alt + 10);
           pop();
-        }
-      }
-
-      function keyPressed() {
-        if (key === 'S' || key === 's') {
-          smile = !smile;
         }
       }
 

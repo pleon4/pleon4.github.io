@@ -1,1 +1,134 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.2/addons/p5.sound.min.js"></script>
+  </head>
+  <body>
+    <button onclick="changeBackground();">Canvia Fons</button>
+    <script>
+      let t = 0;
+      let bgColor;
+      let mic;
+      let smile = false;
+      let mosques = [];
+      let hatHue = 0;
+      let blink = false;
 
+      function setup() {
+        createCanvas(windowWidth, windowHeight);
+        mic = new p5.AudioIn();
+        mic.start();
+        colorMode(HSB, 360, 100, 100);
+        bgColor = color(200, 80, 90);
+
+        for (let i = 0; i < 20; i++) {
+          mosques.push(new Mosca(random(width), random(height)));
+        }
+
+        setInterval(() => {
+          blink = true;
+          setTimeout(() => blink = false, 300); // duració del parpelleig
+        }, 12000); // cada 12 segons
+      }
+
+      function draw() {
+        t += 0.01;
+        hatHue = (hatHue + 0.5) % 360;
+        let noise1 = noise(t) * 100;
+        let noise2 = noise(t + 100) * 50;
+        let h = map(mic.getLevel(), 0, 1, 0, 300);
+
+        background(bgColor);
+
+        // Cara
+        fill(40, 100, 95); // cara en tons suaus
+        ellipse(mouseX, mouseY, 300 + noise1, 300 + noise1);
+
+        // Boca
+        fill(0, 100, 60);
+        if (smile) {
+          arc(mouseX, mouseY + 90, 100, 50 + h, 0, PI);
+        } else {
+          arc(mouseX, mouseY + 90, 100, 50 + h, PI, TWO_PI);
+        }
+
+        // Nas
+        fill(50, 80, 90);
+        triangle(
+          mouseX, mouseY - 60 - h * 3,
+          mouseX - 15, mouseY + 20 - h * 3,
+          mouseX + 15, mouseY + 20 - h * 3
+        );
+
+        // Barret original amb color suau canviant
+        push();
+        fill(hatHue, 100, 60);
+        beginShape();
+        vertex(mouseX - 100, mouseY - 180 - h * 3);
+        vertex(mouseX - 120, mouseY - 220 - h * 3);
+        vertex(mouseX - 60, mouseY - 300 - h * 3);
+        vertex(mouseX + 60, mouseY - 300 - h * 3);
+        vertex(mouseX + 120, mouseY - 220 - h * 3);
+        vertex(mouseX + 100, mouseY - 180 - h * 3);
+        endShape(CLOSE);
+        pop();
+
+        // Ulls rodons
+        fill(0, 0, 100); // blanc
+        ellipse(mouseX - 70, mouseY - 60, 50, blink ? 5 : 50); 
+        ellipse(mouseX + 70, mouseY - 60, 50, blink ? 5 : 50); 
+
+        fill(0, 0, 0); // pupil·la negra
+        ellipse(mouseX - 70, mouseY - 60, 20, blink ? 2 : 20); 
+        ellipse(mouseX + 70, mouseY - 60, 20, blink ? 2 : 20); 
+
+        // Dibuixar les mosques
+        for (let m of mosques) {
+          m.mou();
+          m.mostra();
+        }
+      }
+
+      class Mosca {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.ample = random(10, 30);
+          this.alt = random(20, 40);
+          this.colorAla = color(random(200, 255), 50, 100, 0.6);
+          this.colorCos = color(random(0, 100), 100, 30);
+          this.offsetX = random(1000);
+          this.offsetY = random(1000);
+        }
+
+        mou() {
+          this.x += map(noise(this.offsetX), 0, 1, -1, 1);
+          this.y += map(noise(this.offsetY), 0, 1, -1, 1);
+          this.offsetX += 0.01;
+          this.offsetY += 0.01;
+        }
+
+        mostra() {
+          push();
+          translate(this.x, this.y);
+          fill(this.colorAla);
+          ellipse(-this.ample * 0.8, -this.alt * 0.5, this.ample, this.alt);
+          ellipse(this.ample * 0.8, -this.alt * 0.5, this.ample, this.alt);
+          fill(this.colorCos);
+          ellipse(0, 0, this.ample + 5, this.alt + 10);
+          pop();
+        }
+      }
+
+      function keyPressed() {
+        if (key === 'S' || key === 's') {
+          smile = !smile;
+        }
+      }
+
+      function changeBackground() {
+        bgColor = color(random(0, 360), 80, 90);
+      }
+    </script>
+  </body>
+</html>

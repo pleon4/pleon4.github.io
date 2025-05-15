@@ -1,57 +1,52 @@
-<!DOCTYPE html>
-<html lang="ca">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <title>Web de Pablo</title>
-    <style>body {
-    padding: 0; /* Elimina l'espai extra al voltant del cos */
-}
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.2/p5.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.2/addons/p5.sound.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <script>
+      let mic;
+      let vibracio;
 
-.container-fluid {
-    max-width: 100%; /* Assegura que la navbar ocupa tota l'amplada */
-}
+      function setup() {
+        createCanvas(windowWidth, windowHeight);
+        mic = new p5.AudioIn(); // Entrada d'àudio
+        mic.start(); // Activació del micro
+        angleMode(DEGREES);
+      }
 
-    
-    .navbar {
-    padding-left: 0; /* Elimina el padding esquerra de la navbar */
-}
+      function draw() {
+        background(180, 220, 255); // blau cel de fons
 
-.logo {
-    margin-right: 20px; /* Ajustar el marge si vols separar el logo del text */
-    margin-left: 0; /* Assegurar que no hi hagi marge a l'esquerra */
-}
+        vibracio = random(5, 30); // tremolor més suau
+        let vol = mic.getLevel();
+        let expressio = map(vol, 0, 1, 0, 100); // mida expressiva
+        let colorCara = map(vol, 0, 1, 150, 255); // color que canvia amb el so
 
-    
+        // Cara amb vibració
+        fill(255, colorCara, 180);
+        ellipse(width / 2, height / 2, 280 + vibracio, 280 + vibracio);
 
-.navbar-brand {
-    display: flex;
-    align-items: center;
-}
+        // Ulls amb forma diferent
+        fill(30, 30, 60 + expressio * 2);
+        ellipse(width / 2 - 60, height / 2 - 50, 40, 30); // ull esquerre
+        ellipse(width / 2 + 60, height / 2 - 50, 45, 35 + expressio / 5); // ull dret
 
+        // Boca
+        noFill();
+        stroke(0);
+        strokeWeight(4);
+        let bocaAmplada = 120 + vibracio / 2;
+        let bocaAltura = 30 + expressio;
+        arc(width / 2, height / 2 + 70 + vibracio / 5, bocaAmplada, bocaAltura, 0, 180);
 
-}
-
-.brand-text {
-    white-space: nowrap; /* Això assegura que el text no es trenqui en múltiples línies */
-    font-size: 1.25rem; /* Ajusta la mida de la font si és necessari */
-}  
-.content-container {
-            margin-left: 10px;
-            margin-right: 10px; /* Marges laterals ajustats */
-            margin-top: 20px; /* Afegeix espai superior entre el contingut i la barra de menú */
-        }
-    </style>
-   
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.2/p5.min.js" integrity="sha512-1YMgn4j8cIL91s14ByDGmHtBU6+F8bWOMcF47S0cRO3QNm8SKPNexy4s3OCim9fABUtO++nJMtcpWbINWjMSzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.2/addons/p5.sound.min.js" integrity="sha512-WzkwpdWEMAY/W8WvP9KS2/VI6zkgejR4/KTxTl4qHx0utqeyVE0JY+S1DlMuxDChC7x0oXtk/ESji6a0lP/Tdg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  
-</head>
-<body>
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-       <a class="navbar-brand d-flex align-items-center" href="#">
-    <img src="https://pleon
+        // Barret animat
+        noStroke();
+        fill(80, 0, 150);
+        rect(width / 2 - 80, height / 2 - 170 - vibracio / 2, 160, 40); // part superior
+        fill(60, 0, 120);
+        rect(width / 2 - 100, height / 2 - 130 - vibracio / 2, 200, 20); // visera
+      }
+    </script>
+  </body>
+</html>

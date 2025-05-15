@@ -1,315 +1,193 @@
 <!DOCTYPE html>
-<!.. Indica que el document és HTML5 -->
 <html>
-<head>
-<!-- La secció head conté metadades i enllaços a fitxers externs -->
+  <head>
+    <meta charset="UTF-8">
+    <title>face-api amb càmeres i visualitzacions</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ml5js/Intro-ML-Arts-IMA@ml5-build-10-7-19/ml5_build/ml5.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f4f4f4;
+      }
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        color: #333;
+        z-index: 10;
+      }
+      .loader {
+        width: 50px;
+        height: 50px;
+        border: 6px solid #3498db;
+        border-top: 6px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 10px;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      #canvas-main {
+        border: 2px solid #2c2c2c;
+      }
+      #canvas-points {
+        border: 2px solid #2c2c2c;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading-screen">
+      <div class="loader"></div>
+      <p>Carregant models, si us plau, espera...</p>
+    </div>
 
-<meta charset="UTF-8">
-<!-- Defineix la codificació de caràcters a UTF-8, que suporta accents i símbols especials -->
+    <script>
+      let faceapi;
+      let detections = [];
+      let video;
+      let mainCanvas;
+      let pointsCanvas;
+      let modelsMostrats = false;
+      let obraImg;
 
-<title>Art Geomètric amb Mini Cara i Text Gran</title>
-<!-- Defineix el títol de la pàgina que apareixerà a la pestanya del navegador -->
+      function preload() {
+        obraImg = loadImage("El beso de klimr.avif"); // Assegura't que aquest fitxer està al mateix lloc
+      }
 
-<!-- Llibreries necessàries: s'inclouen des de servidors externs -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.js"></script>
-<!-- Aquesta és la biblioteca p5.js, que facilita la creació de gràfics i animacions en el navegador -->
+      function setup() {
+        mainCanvas = createCanvas(480, 480);
+        mainCanvas.id("canvas-main");
 
-<script src="https://cdn.jsdelivr.net/gh/ml5js/Intro-ML-Arts-IMA@ml5-build-10-7-19/ml5_build/ml5.min.js"></script>
-<!-- Aquesta és la biblioteca ml5.js, que ens permet utilitzar models d'intel·ligència artificial com la detecció facial -->
+        pointsCanvas = createGraphics(600, 600);
+        pointsCanvas.canvas.id = "canvas-points";
+        pointsCanvas.canvas.style.display = "block";
+        pointsCanvas.canvas.style.margin = "20px auto";
 
-<style>
-/*Inici del codi CSS per donar estil a la pàgina*/
+        video = createCapture(VIDEO);
+        video.id("video");
+        video.size(480, 480);
+        video.hide();
 
-body {
-margin: 0;
-padding: 0;
-backfround-color: #f4f4f4;
-/+ Fons de color gris clar*/
-display: flex;
-flex-direction: column;
-align-items: center;
-/*La pàgina està centrada i es distribueixen els elements en columna*/
-}
+        const faceOptions = {
+          withLandmarks: true,
+          withExpressions: true,
+          withDescriptors: true,
+          minConfidence: 0.5
+        };
 
-/*Estils per a la pantlla de càrrega que es mostra abans que es carreguin els models*/
-#loading-screen {
-position: fixed;
-/* La pantalla de càrrega es manté fixa en tot moment a la finestra del navegador*/
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(255,255,255,0.9);
-/* Fons blanc amb lleugera transparència */ display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-/* Centra el contingut de la pantalla (loader i text) */ font-family: Arial, sans-serif;
-font-size: 18px:
-color: #333;
-/* Text en gris fosc per a bona llegibilitat */ Z-index: 10;
-/* Es col-loca per sobre de tot el contingut (amb un index z alt) */
-}
-.loader {
-width: 50px;
-height: 50px;
-border: 6px solid #3498db;
-/* Marge de 6 píxels de grosor amb color blau (part de la vora) */ 
- border-top: 6px solid transparent;
-/* La part superior és transparent per fer l'efecte giratori */ 
- border-radius: 50%;
-/* Fa el loader circular */ 
- animation: spin 1s linear infinite;
-/* Aplica una animació que fa girar l'element indefinidament */ 
- margin-bottom: 10px;
-/* Declaració de la keyframe de l'animació per girar l'element loader */ 
-@keyframes spin {
-0% { transform: rotate(0deg); }
-100% { transform: rotate(360deg); }
-}
-/* Fi de l'estil CSS */ 
-</style>
-</head>
-<body>
-<!-- Cos del document: aquí es col loca el contingut visible a la página -->
+        faceapi = ml5.faceApi(video, faceOptions, faceReady);
+      }
 
-<!-- Pantalla de carrega: s'exhibeix mentre es carteguen els models de detecció facial --> 
-<div id="loading-screen">
-<div class="loader"></div>
-<!-- Element visual que gira per mostrar que s'està carregant --> 
-<p> Carregant models, si us plau, espera...</p>
-<!-- Missatge per informar a l'usuari que s'està carregant el model -> 
-</div>
-  
-<script>
-/* Inici del codi JavaScript */
-  
-// Declarem variables globals utilitzades en el codi
-let faceapi;
-// Aquesta variable emmagatzemarà el model de detecció facial de mlS.js
-  
-let detections = [];
-// Array on es guardaran els resultats (deteccions) que ens proporciona el model facial
-  
-let video;
-// Variable que guardarà la captura de vídeo de la càmera
-  
-let modelsMostrats = false;
-// Variable booleana per controlar si ja s'ha amagat la pantalla de carrega
-  
-// Variables per a la mida de la mini image de la cara que es mostrarà
-const miniWidth = 120;
-const miniHeight = 120;
-  
-// Funció setup de p5.js, s'executa una vegada al principi
-function setup() {
-// Creem un canvas (llindar per dibuixos) de 600x600 píxels
-// createCanvas(600, 600);
-  
-createCanvas window Width, windowHeight); // Canvi aquí
-  
-// Iniciem la captura de vídeo des de la càmera de l'usuari
-video = createCapture(VIDEO);
-video.size(480, 480);
-// Es defineix la mida del video
-video.hide();
-// Amaguem el vídeo perquè només s'utilitzi per processar la imatge, no per mostrar-lo
-directament
-  
-// Opcions per a la detecció facial (configuració del model)
-const faceOptions = {
-withLandmarks: true, // Detecta els punts clau de la cara (ulls, nas, boca, etc.)
-withExpressions: true, // Detecta les expressions facials (felicitat, tristesa, etc.)
-withDescriptors: false, // No sol-licita descriptors facials (informació per reconèixer
-cares)
-minConfidence: 0.5 // Nivell mínim de certesa per considerar una detecció valida};
-  
-// Inicializa el model de detecció facial amb el vídeo i les opcions definides
-faceapi = ml5.faceApi(video, faceOptions, faceReady);
-// Quan el model estigui preparat, es cridarà la funció faceReady
-}
+      function faceReady() {
+        faceapi.detect(gotFaces);
+      }
 
-// Funció que s'executa quan el model de detecció facial està llest
-function faceReady() {
-faceapi.detect(gotF aces);
-// Inicia la detecció facial cridant la funció gotFaces quan es completen les deteccions
-}
+      function gotFaces(error, result) {
+        if (error) {
+          console.log(error);
+          return;
+        }
+        detections = result;
 
-function windowResized() {
-resizeCanvas(window Width, windowHeight); // Nova funció per adaptar el canvas
-}
-  
-// Funció que s'executa cada cop que ml5.js té les deteccions d'una cara
-funcion gotFaces(error, result){
-if (error) {
-console.error(error);
-// En cas d'error, s'imprimeix a la consola i es deté l'execució
-return;
-}
+        if (!modelsMostrats) {
+          document.getElementById("loading-screen").style.display = "none";
+          modelsMostrats = true;
+        }
 
-detections = result;
-// Guarda el resultat de les deteccions (poden ser múltiples cares, però en aquest cas s'utilitza la primera)
-if (ImodelsMostrats) {
-// Si encara no s'ha amagat la pantalla de càrrega...
-document.getElementById("loading-screen").style.display = "none";
-// ...amaguem l'element amb id "loading-screen"
-modelsMostrats = true;
-// Actualitzem la variable perquè no es torni a amagar més tard (ja ho hem fet)
-}
+        faceapi.detect(gotFaces);
+      }
 
-// Torna a iniciar la detecció facial de forma contínua
-faceapi detect(gotFaces);
- }
+      function draw() {
+        image(video, 0, 0, width, height);
 
-// Funció draw de p5.js, s'executa moltes vegades per segon per actualitzar la pantalla
-function draw() {
-// Es pinta el fons de color blanc cada vegada que es redibuixa el canvas
-background(255);
-  
-// Variables per emmagatzemar el sentiment (expressió facial) i la seva intensitat
-let dominant = "neutre";
-let intensity = 0;
-  
-// Si hi ha deteccions i almenys una cara
-if (detections && detections.length > 0) {
-// Es recuperen les expressions facials de la primera detecció
-let expr = detections[0].expressions;
-// Es determina quina és l'expressió dominant (amb més probabilitat) comparant els
-valors
-dominant = Object.keys(expr).reduce((a, b) => expr[a] > expr[b]? a : b);
-// També s'extreu la intensitat de l'expressió dominant
-intensity = expr[dominant];
-}
-  
-// Es dibuixa art geomètric diferent segons el sentiment detectat
-drawDifferentArt(dominant, intensity);
-  
-// Dibuixa un text amb el nom de l'expressió facial a la part superior del canvas
-noStroke();
-fill(44, 169, 225);
-textSize(48);
-textAlign(CENTER, CENTER);
- 
-text("Expressio:" + dominant, width/2, 50);
-//"width/2" centra el text horitzontalment i "50" és la coordenada vertical
- 
-// Dibuixa una mini imatge de la cara a la part inferior dreta del canvas
-if (detections && detections.length > 0) {
-// Es fa servir la imatge del vídeo capturat per representar la cara
- image(video, width - mini Width - 20, height - miniHeight - 20, miniWidth, 
- miniHeight);
-}
-}
- 
-// Funció per dibuixar art geomètric en funció de l'expressió facial detectada
-function drawDifferentArt(dominant, intensity) {
-push();
-// Guarda l'estat actual de les transformacions gràfiques
- 
-translate(width/2, height/2);
-// Trasllada l'origen del sistema de coordenades al centre del canvas
- 
-noFill();
-// Es desactiva el farcit (no es pinta amb color les formes interiors)
- 
-stroke Weight(4);
-// Defineix l'amplada del traç (línia de dibuix) en 4 pixels
- 
-// Utilitza una estructura switch per triar el dibuix en funció del sentiment detectat
-switch (dominant) {
-case "happy":
-// Cas: expressió "happy" (feliç) → es dibuixen ones radials
-for (let i = 1; i <= 10; i++) {
-// Es recorre des de 1 fins a 10 per dibuixar cercles creixents
-stroke(random(200,255), random (200,255), 0, 150);
-// Cada cercle té un traç amb tonalitats grogues (el color és aleatori entre 200 i 255 per
-vermell i verd)
-ellipse(0, 0, i * 20 * intensity, i * 20 * intensity);
-// Dibuixa una el-lipse centrada, amb mida en funció del número d'iteració i la
-intensitat de l'expressió
-}
-break;
-case "sad":
-// Cas: expressió "sad" (trist) → es dibuixen línies verticals
-stroke(50, 100, 200, 150);
-// Traç amb un color blau fosc translúcid
-for (let x = -200; x <= 200; x += 40) {
-// Dibuixa línies verticals espaiades cada 40 píxels des del -200 fins a 200 en l'eix X
-line(x, -200, x, 200);
-break;
-case "angry":
-// Cas: expressió "angry" (enfadat) → dibuix d'un zigzag agressiu
-stroke(200, 0, 0, 150);
-// Traç de color vermell amb certa transparencia
-beginShape();
-// Inicia la definició d'una forma complexa definida per diversos vertexs
-for (let x = -250; x <= 250; x += 20) {
-// Recorre l'eix X des de -250 fins a 250 amb increments de 20 píxels
-let y = (x % 40 === 0)? -150: 150;
-// Alterna el valor de y entre -150 i 150 per crear efecte zigzag (la condició mira si x és
-múltiple de 40)
-vertex(x, y * intensity);
-// Es posa un punt a la forma amb la coordenada (x, y ajustada per la intensitat)
-}
-endShape();
-// Acaba la definició de la forma complexa
-break;
-case "fearful":
-// Cas: expressió "fearful" (por) → dibuixa una línia ondulada
-stroke(100, 100, 100, 150);
-// Traç de color gris amb transparència
-beginShape();
-for (let x = -250; x <= 250; x += 10) {
-// Recorre l'eix X des de -250 fins a 250, amb increments de 10 píxels
-let y = 50* sin(x * 0.1 * intensity);
-// Calcula la coordenada y com la funció sinus per crear l'efecte ondulat (multiplicant
-per 50 i l'intensitat)
-vertex(x, Y);
-// Afegeix aquest punt a la forma ondulada
-}
-endShape();
-break;
-case "surprised":
-// Cas: expressió "surprised" (sobtada) → cercles concèntrics amb petites variacions
-stroke(0, 150, 255, 150);
-// Traç de color blau clar amb transparència
- for (let i = 1; i <= 8; i++) {
-// Dibuixa 8 cercles concèntrics
-ellipse(random(-10, 10), random(-10, 10), i * 30 * intensity, i * 30* intensity);
-// Cada cercle té una petita variació en la seva posició (aleatòria en un interval de -10 a
-10)
-}
-break;
-case "disgusted":
-// Cas: expressió "disgusted" (disgustat) → dibuix abstracte amb línies irregulars
-stroke(0, 150, 0, 150);
-// Traç de color verd amb transparència
-beginShape();
-for (let x = -250; x <= 250; x += 15) {
-// Recorre l'eix X amb increments de 15 pixels
-let y = random(-50, 50) * intensity;
-// La coordenada y és un valor aleatori (multiplicat per la intensitat)
-vertex(x, y);
-// Afegeix aquest punt a la forma abstracta
-}
-endShape();
-break;
-default:
-// Cas per a l'estat "neutre" o qualsevol altre que no coincideixi amb els casos anteriors
-// Dibuixa una quadrícula simple
-stroke(150, 150, 150, 150);
-// Traç de color gris per a la quadrícula
-for (let i = -200; i <= 200; i += 40) {
-for (let j = -200; j <= 200; j += 40) {
-rect(i, j, 30, 30);
-// Dibuixa petits quadrats de 30x30 píxels en cada intersecció de la quadricula
-}
-}
-}
-pop();
-// Restaura l'estat de les transformacions gràfiques al que era abans de fer el translate i
-altres canvis
-/* Fi del codi JavaScript */ 
-</script>
-</body>
+        if (detections && detections.length > 0) {
+          drawOverlay(detections);
+        }
+
+        pointsCanvas.clear();
+        if (detections && detections.length > 0) {
+          drawBigFace(pointsCanvas, detections[0]);
+        }
+      }
+
+      function drawOverlay(detections) {
+        for (let f = 0; f < detections.length; f++) {
+          let d = detections[f];
+          let box = d.alignedRect._box;
+
+          stroke(44, 169, 225);
+          strokeWeight(2);
+          noFill();
+          rect(box._x, box._y, box._width, box._height);
+
+          let points = d.landmarks.positions;
+          for (let i = 0; i < points.length; i++) {
+            fill(255, 0, 0);
+            noStroke();
+            ellipse(points[i]._x, points[i]._y, 5, 5);
+          }
+
+          let expr = d.expressions;
+          let dominant = Object.keys(expr).reduce((a, b) => expr[a] > expr[b] ? a : b);
+          noStroke();
+          fill(44, 169, 225);
+          textSize(16);
+          textFont('Helvetica Neue');
+          text("Expressió: " + dominant, 10, height - 20);
+        }
+      }
+
+      function drawBigFace(pg, detection) {
+        let expr = detection.expressions;
+        let dominant = Object.keys(expr).reduce((a, b) => expr[a] > expr[b] ? a : b);
+
+        if (dominant === "happy") {
+          pg.tint(255); // Sense filtre
+          pg.image(obraImg, 0, 0, pg.width, pg.height);
+        } else if (dominant === "sad") {
+          pg.tint(100, 100, 255); // Filtre blau
+          pg.image(obraImg, 0, 0, pg.width, pg.height);
+        } else {
+          // Dibuix alternatiu si no és ni feliç ni trist
+          let cx = pg.width / 2;
+          let cy = pg.height / 2;
+          let faceSize = 300;
+
+          pg.noTint();
+          pg.fill(255);
+          pg.stroke(0);
+          pg.ellipse(cx, cy, faceSize, faceSize);
+          pg.fill(0);
+          pg.ellipse(cx - faceSize / 5, cy - faceSize / 5, 30, 30);
+          pg.ellipse(cx + faceSize / 5, cy - faceSize / 5, 30, 30);
+          pg.noFill();
+          pg.strokeWeight(4);
+          pg.stroke(0);
+          pg.line(cx - 70, cy + faceSize / 8, cx + 70, cy + faceSize / 8);
+          pg.noStroke();
+          pg.fill(44, 169, 225);
+          pg.textSize(24);
+          pg.textAlign(CENTER, CENTER);
+          pg.text("Expressió: " + dominant, cx, cy + faceSize / 2 + 30);
+        }
+      }
+    </script>
+  </body>
 </html>

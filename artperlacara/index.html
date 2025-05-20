@@ -50,7 +50,7 @@
 
     /* Animació de gir */
     @keyframes spin {
-      0% { transform: rotate(0deg); }
+      0% { transform: rotate (0deg); }
       100% { transform: rotate(360deg); }
     }
   </style>
@@ -144,20 +144,6 @@
         image(video, width - 140, height - 140, 120, 120);
       }
     }
-
-    // Dibuixa diferents figures depenent de l'estat emocional
-    function drawArt(dominant, intensity) {
-      noFill();
-      strokeWeight(4);
-
-      switch (dominant) {
-        case 'happy':
-          stroke(255,200,0); // groc
-         fill(255* intensity, 0, 236 * intensity );//color rosa perque es content
-
-      switch (dominant) {
-        case 'happy':
-      text ("intensitat: "  + Math.round(intensity * 100)*+" % ", width / 2, 50);
           stroke(254, 130, 34); // tronja
           beginShape();//cara
 vertex(531, 143.1875);

@@ -139,13 +139,14 @@
       text("Expressió: " + dominant, width / 2-100, 10);
       textSize(14);
       text ("Intensitat: " + Math.round(intensity * 100)+" % ", width / 2+200, 20);
+      fill (intensity*255, intensity*255,intensity*127, intensity*68)
       // Mostra el vídeo si hi ha detecció
       if (detections.length > 0) {
         image(video, width - 140, height - 140, 120, 120);
       }
     }
-          stroke(254, 130, 34); // tronja
-          beginShape();//cara
+stroke(235, 214, 196 ); // (color carn)
+beginShape();//cara
 vertex(531, 143.1875);
 vertex(532, 147.1875);
 vertex(533, 154.1875);
@@ -180,22 +181,24 @@ vertex(559, 129.1875);
 vertex(547, 133.1875);
 vertex(533, 139.1875);
 endShape(CLOSE);
-          stroke(0, 0, 0); // tronja
-          beginShape();//ceja derecha
+    
+stroke(0, 0, 0); // (tronja)
+beginShape();//ceja derecha
 vertex(613, 117.1875);
 vertex(613, 122.1875);
 vertex(613, 130.1875);
 endShape(CLOSE);
-          stroke(0, 0, 0); // tronja
-          beginShape();//ceja izquierda
+stroke(255, 119, 0); // (tronja)
+beginShape();//ceja izquierda
 vertex(613, 151.1875);
 vertex(614, 155.1875);
 vertex(615, 160.1875);
 vertex(615, 165.1875);
 vertex(614, 169.1875);
 endShape(CLOSE);
-           stroke(254,130,34); // taronja
-          beginShape();//pelo
+    
+stroke(254,130,34); // (taronja)
+beginShape();//pelo
 vertex(594, 109.1875);
 vertex(598, 110.1875);
 vertex(601, 108.1875);
@@ -249,22 +252,22 @@ vertex(601, 86.1875);
 vertex(599, 93.1875);
 vertex(595, 99.1875);
 endShape(CLOSE);
-          stroke(0, 0, 0)//negro
-          beginShape();// ojo izquierdo
+stroke(0, 0, 0)//(negro)
+beginShape();// ojo izquierdo
 vertex(600, 157.1875);
 vertex(599, 162.1875);
 vertex(599, 168.1875);
 vertex(600, 172.1875);
-endShape(close);
-          stroke(0, 0, 0)//negro
-          beginShape();//ojo derecho
+endShape(cLOSE);
+stroke(0, 0, 0)//(negro)
+beginShape();//ojo derecho
 vertex(600, 119.1875);
 vertex(597, 124.1875);
 vertex(597, 129.1875);
 vertex(599, 135.1875);
-endShape(close);
-          stroke(245, 47, 116)
-          beginShape();//boca
+endShape(CLOSE);
+stroke(245, 47, 116)//color rojo (preferiblemente el de los lavios de la escultura (la de la chica) de la obra del Beso de Klim.
+beginShape();//boca
 vertex(563, 134.1875);
 vertex(557, 139.1875);
 vertex(556, 145.1875);
@@ -273,8 +276,8 @@ vertex(561, 154.1875);
 vertex(564, 149.1875);
 vertex(565, 142.1875);
 endShape(CLOSE);
-          stroke(221, 203, 187)
-          beginShape();//primer brazo
+stroke(221, 203, 187)// color carne
+beginShape();//primer brazo
 vertex(566, 191.1875);
 vertex(568, 190.1875);
 vertex(572, 189.1875);
@@ -344,7 +347,186 @@ vertex(543, 213.1875);
 vertex(548, 202.1875);
 vertex(551, 196.1875);
 vertex(557, 192.1875);
-endShape();
+endShape(CLOSE);
+beginShape(CLOSE);//cuerpo del hombre y cara
+stroke(255, 119, 0)
+vertex(524, 138.1875);
+vertex(530, 139.1875);
+vertex(534, 138.1875);
+vertex(539, 132.1875);
+vertex(542, 132.1875);
+vertex(548, 127.1875);
+vertex(555, 124.1875);
+vertex(560, 123.1875);
+vertex(565, 120.1875);
+vertex(569, 120.1875);
+vertex(575, 120.1875);
+vertex(579, 120.1875);
+vertex(583, 119.1875);
+vertex(585, 114.1875);
+vertex(588, 109.1875);
+vertex(591, 103.1875);
+vertex(594, 97.1875);
+vertex(595, 94.1875);
+vertex(600, 85.1875);
+vertex(602, 79.1875);
+vertex(599, 71.1875);
+vertex(597, 63.1875);
+vertex(595, 56.1875);
+vertex(591, 50.1875);
+vertex(587, 42.1875);
+vertex(584, 34.1875);
+vertex(581, 26.1875);
+vertex(575, 24.1875);
+vertex(566, 17.1875);
+vertex(558, 14.1875);
+vertex(548, 14.1875);
+vertex(537, 15.1875);
+vertex(530, 14.1875);
+vertex(522, 14.1875);
+vertex(512, 17.1875);
+vertex(504, 20.1875);
+vertex(494, 22.1875);
+vertex(491, 24.1875);
+vertex(481, 25.1875);
+vertex(473, 24.1875);
+vertex(465, 23.1875);
+vertex(461, 23.1875);
+vertex(450, 21.1875);
+vertex(442, 23.1875);
+vertex(436, 25.1875);
+vertex(429, 28.1875);
+vertex(422, 30.1875);
+vertex(414, 33.1875);
+vertex(403, 37.1875);
+vertex(395, 43.1875);
+vertex(383, 49.1875);
+vertex(373, 52.1875);
+vertex(366, 55.1875);
+vertex(355, 63.1875);
+vertex(346, 68.1875);
+vertex(340, 73.1875);
+vertex(338, 80.1875);
+vertex(335, 87.1875);
+vertex(327, 90.1875);
+vertex(318, 92.1875);
+vertex(313, 97.1875);
+vertex(308, 106.1875);
+vertex(308, 115.1875);
+vertex(300, 120.1875);
+vertex(294, 124.1875);
+vertex(291, 130.1875);
+vertex(291, 136.1875);
+vertex(287, 141.1875);
+vertex(287, 144.1875);
+vertex(286, 149.1875);
+vertex(284, 158.1875);
+vertex(282, 166.1875);
+vertex(281, 174.1875);
+vertex(281, 180.1875);
+vertex(280, 188.1875);
+vertex(279, 195.1875);
+vertex(279, 203.1875);
+vertex(277, 212.1875);
+vertex(277, 218.1875);
+vertex(275, 226.1875);
+vertex(274, 233.1875);
+vertex(274, 245.1875);
+vertex(273, 253.1875);
+vertex(274, 260.1875);
+vertex(274, 268.1875);
+vertex(269, 275.1875);
+vertex(273, 280.1875);
+vertex(272, 289.1875);
+vertex(269, 299.1875);
+vertex(268, 307.1875);
+vertex(268, 314.1875);
+vertex(267, 324.1875);
+vertex(266, 330.1875);
+vertex(267, 340.1875);
+vertex(270, 348.1875);
+vertex(271, 358.1875);
+vertex(269, 363.1875);
+vertex(268, 368.1875);
+vertex(268, 375.1875);
+vertex(268, 384.1875);
+vertex(268, 391.1875);
+vertex(268, 398.1875);
+vertex(269, 408.1875);
+vertex(269, 417.1875);
+vertex(270, 425.1875);
+vertex(271, 431.1875);
+vertex(271, 443.1875);
+vertex(271, 457.1875);
+vertex(271, 467.1875);
+vertex(270, 478.1875);
+vertex(273, 489.1875);
+vertex(274, 496.1875);
+vertex(281, 496.1875);
+vertex(288, 496.1875);
+vertex(290, 496.1875);
+vertex(299, 495.1875);
+vertex(305, 497.1875);
+vertex(312, 495.1875);
+vertex(319, 495.1875);
+vertex(325, 496.1875);
+vertex(333, 497.1875);
+vertex(341, 494.1875);
+vertex(346, 494.1875);
+vertex(356, 494.1875);
+vertex(361, 493.1875);
+vertex(371, 493.1875);
+vertex(382, 493.1875);
+vertex(390, 495.1875);
+vertex(401, 492.1875);
+vertex(409, 492.1875);
+vertex(419, 494.1875);
+vertex(426, 494.1875);
+vertex(435, 496.1875);
+vertex(445, 496.1875);
+vertex(451, 495.1875);
+vertex(458, 495.1875);
+vertex(465, 495.1875);
+vertex(473, 492.1875);
+vertex(473, 484.1875);
+vertex(473, 470.1875);
+vertex(468, 461.1875);
+vertex(465, 451.1875);
+vertex(464, 445.1875);
+vertex(461, 434.1875);
+vertex(460, 422.1875);
+vertex(459, 407.1875);
+vertex(457, 393.1875);
+vertex(458, 385.1875);
+vertex(453, 372.1875);
+vertex(449, 362.1875);
+vertex(446, 352.1875);
+vertex(440, 332.1875);
+vertex(436, 322.1875);
+vertex(431, 309.1875);
+vertex(429, 299.1875);
+vertex(426, 284.1875);
+vertex(424, 274.1875);
+vertex(424, 266.1875);
+vertex(426, 260.1875);
+vertex(433, 247.1875);
+vertex(444, 233.1875);
+vertex(447, 221.1875);
+vertex(450, 214.1875);
+vertex(454, 204.1875);
+vertex(459, 197.1875);
+vertex(466, 188.1875);
+vertex(471, 183.1875);
+vertex(478, 176.1875);
+vertex(487, 164.1875);
+vertex(496, 156.1875);
+vertex(498, 154.1875);
+vertex(503, 150.1875);
+vertex(509, 142.1875);
+vertex(514, 139.1875);
+endShape(CLOSE);
+    
+
           break;
       }
     }
